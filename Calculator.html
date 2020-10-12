@@ -1,0 +1,196 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Calculator</title>
+</head>
+<style>
+    body{
+        background-image: linear-gradient(-60deg, #ff9768 0%, #9156e1 100%);
+        height: 1200px;
+        user-select: none;
+    }
+    .container{
+
+        margin: 0 auto;
+        display:grid;
+        grid-template-columns: repeat( 4,1fr );
+        grid-gap: 4px;
+        background-color: rgb(196, 195, 195);
+        border-radius: 10px;
+        padding: 5px;
+        max-width: 400px;
+
+    }
+    .item{
+        background-color: white;
+        color: blue;
+        display:flex;
+        justify-content: center;
+        cursor:pointer; 
+        font-size: 20px;
+        font-weight:bold;
+        padding: 16px;
+        align-items: center;
+    }
+    .item:hover{
+        background-color: #e3a2f0;
+        
+    }
+    .oper{
+        background-color: rgb(233, 233, 233);
+    }
+    input{
+        padding: 0px;
+        width: 100%;
+        height: 40px;
+        border: none;
+        text-align:right;
+        font-size: 26px;
+        color: blue;
+        outline:none;
+        background-color: rgb(196, 195, 195);
+        font-size: 32px;
+        
+    }
+    .input{
+        grid-column: 1/5;
+        grid-row: 2/3;
+        padding-right: 5px;
+       
+        
+    }
+    .secondD{
+        grid-column: 1/5;
+        grid-row: 1/2;
+        text-align:right;
+        padding-right: 5px;
+        font-size: 20px;
+        height: 30px;
+        
+    }
+    form{
+           max-width: 100%;
+    }
+    .clean{
+        grid-column: 1/3;
+
+    }
+    .back{
+       
+        grid-column: 3/-1;
+        
+
+    }
+    .equal{
+        grid-column: 4/5 ;
+        grid-row: 7/9;
+        
+    }
+    .zero{
+        grid-column:  1/3;
+    }
+
+
+
+</style>
+<body>
+<div class="container">
+    <div class="input" >
+        <form  name="form">   <input @keyup.enter = "equal()" type="text" name="textview" oninput="doubleIn()"> </form>
+    </div>
+    <div class="input secondD"> <span id="doublein"></span>  </div>
+    <div class="item clean oper" onclick ="clean()"> C </div>
+    <div class="item back oper" onclick ="cleanLast()"> D </div>
+    <div class="item oper" onclick = "insert('+'), doubleIn() " > + </div>
+    <div class="item oper" onclick = "insert('-'), doubleIn() "> - </div>
+    <div class="item oper" onclick = " invert()"> +-</div>
+    <div class="item oper" onclick = "cleanNum() "> CE </div>
+    <div class="item" onclick = "insert('7') ">7</div>
+    <div class="item" onclick = "insert('8') "> 8</div>
+    <div class="item" onclick = "insert('9') "> 9</div>
+    <div class="item oper" onclick = "insert('*'), doubleIn() ">&times; </div>
+    <div class="item" onclick = "insert('4') "> 4</div>
+    <div class="item" onclick = "insert('5') "> 5</div>
+    <div class="item" onclick = "insert('6') "> 6</div>
+    <div class="item oper" onclick = "insert('/'), doubleIn()  "> &divide;</div>
+    <div class="item" onclick = "insert('1') "> 1</div>
+    <div class="item" onclick = "insert('2') "> 2</div>
+    <div class="item" onclick = "insert('3') "> 3</div>
+    <div class="item equal oper" onclick = "equal()"> =</div>
+    <div class="item zero " onclick = "insert('0') "> 0</div>
+    <div class="item oper" onclick = "insert('.') "> .</div>
+</div>
+
+    <script>
+        function insert(num){
+            document.form.textview.value = document.form.textview.value + num;
+        }
+        function clean(){
+            document.form.textview.value = "";
+            document.getElementById("doublein").innerHTML='';
+
+        }
+        function cleanLast(){
+             let a = document.form.textview.value ;
+             document.form.textview.value = a.substring(0,a.length-1);
+        }
+        function equal(){
+            document.getElementById("doublein").innerHTML += document.form.textview.value;
+            let a=document.getElementById("doublein").innerHTML ;
+            if(a){
+                document.form.textview.value =eval(a);
+            }
+            
+
+        }
+        function invert(){
+
+            let a=document.form.textview.value ;
+            if(a){
+                if (a[0] =='-'){
+
+                    document.form.textview.value = a.substring(1,a.length);
+                }
+                else{
+                    document.form.textview.value = "-" + a ;
+                }
+            }
+        }
+        
+        function cleanNum(){
+            let a=document.form.textview.value ;
+            arr=['+', '-', '*', '/'];
+            let num=false;
+            for(let i=1; i < a.length-1 && num==false; i++){
+                for(let j=0; j<4; j++){
+                    if(a[i]==arr[j]){
+                        document.form.textview.value = a.substring(0,i+1);
+                        num=true;
+                        break;
+                    }
+                }
+            }
+            if(!num){
+                document.form.textview.value='';
+            }
+        }
+         
+
+        function doubleIn(){
+           
+            let a=document.form.textview.value ;
+            ops=['+', '-', '*', '/'];
+            for(let i=0; i<4; i++){
+                if (a[a.length-1] == ops[i]){
+                    document.getElementById("doublein").innerHTML += document.form.textview.value;
+                    document.form.textview.value='';
+                    break;
+                }
+            }
+        }
+
+    </script>
+
+        
+</body>
+</html>
