@@ -96,7 +96,7 @@
 <body>
 <div class="container">
     <div class="input" >
-        <form  name="form">   <input @keyup.enter = "equal()" type="text" name="textview" oninput="doubleIn()"> </form>
+        <form  name="form">   <input @keyup.enter = "equal()" type="text" name="textview" oninput="insertKey (), doubleIn()"> </form>
     </div>
     <div class="input secondD"> <span id="doublein"></span>  </div>
     <div class="item clean oper" onclick ="clean()"> C </div>
@@ -122,72 +122,127 @@
 </div>
 
     <script>
-        function insert(num){
-            document.form.textview.value = document.form.textview.value + num;
+        let answer=false;       // глобальная переменная, есть ли на экане какое то вычисленное выражение
+        function Op(s){ // проверка является ли символ операцией или точкой
+            ops=['+', '-', '*', '/','.'];    
+            for(let i=0; i<5; i++){             
+                if (s == ops[i]){       //сравнение числа с операциями
+                    return true;        
+                }
+            }
+            return false;
         }
-        function clean(){
-            document.form.textview.value = "";
+
+        function insertKey (){              // обрабатывает ввод с клавиатуры   ---НЕ РАБОАТЕТ!!!---
+            let a=document.getElementById("doublein").innerHTML ;
+            let b=document.form.textview.value;
+            num=b[b.length-1];                  // введенный знак
+            if (Op(num)==true){             // если знак является операцией
+                if ( b.substring(0,b.length-1)=='' || Op(a[a.length-1])==true || Op(b[b.length-1])==true ){ //если его нельзя поставить
+                    document.form.textview.value = b.substring(0, b.length );   // перезаписываем строку тут же без знака
+                }
+            }
+            
+        }
+
+        function insert(num){           // прибавляет к старому значению новую цифру
+
+            let a=document.getElementById("doublein").innerHTML ;
+            let b=document.form.textview.value;
+            if (Op(num)==true){                         // если это операция
+                if ( b !='' && Op(a[a.length])==false && Op(b[b.length-1])==false ){ //можно ли поставить операцию
+                    if(answer){                 // если выведен ответ на предыдущее выражение  то перевести ответ вверх и поставить к нему операцию
+                        document.getElementById("doublein").innerHTML=b+num;
+                        document.form.textview.value='';
+                        answer=false;
+                    }
+                    else{       // если не ответ то просто подставить операцию
+                        document.form.textview.value += num;
+                    }
+                }
+                
+            }
+            else{ // если вводится число и на экране ответ на предыдущее выражение стереть его, иначе просто записать число
+                if(answer==true){   
+                    clean();
+                    document.form.textview.value = num;
+                    answer=false;
+                }
+                else{
+                    document.form.textview.value += num;
+                }
+            }
+
+        }
+        function clean(){           // очистка обоих экранов
+            document.form.textview.value = "";              
             document.getElementById("doublein").innerHTML='';
 
         }
-        function cleanLast(){
-             let a = document.form.textview.value ;
-             document.form.textview.value = a.substring(0,a.length-1);
+        function cleanLast(){   //удаление последнего символа
+             let a = document.form.textview.value ;             
+             document.form.textview.value = a.substring(0,a.length-1); // перезаписываем в строку все с первого по предпоследний символ
         }
         function equal(){
-            document.getElementById("doublein").innerHTML += document.form.textview.value;
+            document.getElementById("doublein").innerHTML += document.form.textview.value; //добавляем последнее введенное число
             let a=document.getElementById("doublein").innerHTML ;
-            if(a){
-                document.form.textview.value =eval(a);
+            if(a){                                             //если строка не пустая то вычисляем её
+                if(eval(a) != undefined)   {                            // если выражение считается выводим ответ    
+                    document.form.textview.value =eval(a);
+                    answer=true;                        
+                }
             }
             
 
         }
-        function invert(){
-
+        function invert(){      // +-
+ 
             let a=document.form.textview.value ;
-            if(a){
-                if (a[0] =='-'){
+            if(a){                          //
+                if (a[0] =='-'){                //если в конце строки стоит минус то выводим всю строку без него
 
                     document.form.textview.value = a.substring(1,a.length);
                 }
-                else{
+                else{               //если в конце строки нет минуса то прибавляем его
                     document.form.textview.value = "-" + a ;
                 }
             }
         }
         
-        function cleanNum(){
+        function cleanNum(){            //удаляет последнее число
             let a=document.form.textview.value ;
-            arr=['+', '-', '*', '/'];
+            arr=['+', '-', '*', '/'];              
             let num=false;
-            for(let i=1; i < a.length-1 && num==false; i++){
+            for(let i=1; i < a.length-1 && num==false; i++){        //алгоритм поиска знака операции
                 for(let j=0; j<4; j++){
                     if(a[i]==arr[j]){
-                        document.form.textview.value = a.substring(0,i+1);
+                        document.form.textview.value = a.substring(0,i+1);      //если знак нашелся то вывести все до него
                         num=true;
                         break;
                     }
                 }
             }
-            if(!num){
+            if(!num){                           // если знака нет то значит всё -число, удалить
                 document.form.textview.value='';
             }
         }
          
 
-        function doubleIn(){
-           
-            let a=document.form.textview.value ;
+        function doubleIn(){            // вывод чисел сверху срабатывает пр каждом вводе
+
+            let a=document.form.textview.value ;   
+            let b =document.getElementById("doublein").innerHTML;
             ops=['+', '-', '*', '/'];
-            for(let i=0; i<4; i++){
-                if (a[a.length-1] == ops[i]){
-                    document.getElementById("doublein").innerHTML += document.form.textview.value;
+            for(let i=0; i<4; i++){             
+                if (a[a.length-1] == ops[i]){       //сравнение введённого числа с операциями
+                    document.getElementById("doublein").innerHTML += document.form.textview.value; // если введена операция то копируем строку вверх
                     document.form.textview.value='';
                     break;
                 }
             }
         }
+
+
 
     </script>
 
